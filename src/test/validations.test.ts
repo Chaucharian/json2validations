@@ -6,13 +6,13 @@ import {
   parse,
   addDays,
   addMonths,
-} from 'date-fns';
-import { enUS } from 'date-fns/locale';
-import { FormErrors, SchemaError, ValidationError } from '../errors';
-import buildSchema from '../main';
+} from "date-fns";
+import { enUS } from "date-fns/locale";
+import { FormErrors, SchemaError, ValidationError } from "../errors";
+import buildSchema from "../main";
 
-describe('Internal build flow', () => {
-  test('should throw an error cause custom validation on JSON schema was not found on config object', () => {
+describe("Internal build flow", () => {
+  test("should throw an error cause custom validation on JSON schema was not found on config object", () => {
     const config = {
       defaultFieldTypes: {
         string: {
@@ -27,21 +27,21 @@ describe('Internal build flow', () => {
       },
     };
     const fields = {
-      stringField: '01/01/2007',
+      stringField: "01/01/2007",
     };
     const schema = {
       fields: {
         stringField: {
-          type: 'string',
+          type: "string",
           validations: {
-            extends: ['THIS_VALIDATION_IS_MISSING'],
+            extends: ["THIS_VALIDATION_IS_MISSING"],
           },
         },
       },
     };
     expect(() => buildSchema(schema, fields, config)).toThrowError();
   });
-  test('should pass cause custom validation on JSON schema was found on config object', () => {
+  test("should pass cause custom validation on JSON schema was found on config object", () => {
     const config = {
       defaultFieldTypes: {
         string: {
@@ -56,14 +56,14 @@ describe('Internal build flow', () => {
       },
     };
     const fields = {
-      stringField: '01/01/2007',
+      stringField: "01/01/2007",
     };
     const schema = {
       fields: {
         stringField: {
-          type: 'string',
+          type: "string",
           validations: {
-            extends: ['maxThan100'],
+            extends: ["maxThan100"],
           },
         },
       },
@@ -73,15 +73,15 @@ describe('Internal build flow', () => {
   });
 });
 
-describe('Custom date validations', () => {
-  describe('older than 18 years', () => {
-    test('should throw an error by invalid date', () => {
+describe("Custom date validations", () => {
+  describe("older than 18 years", () => {
+    test("should throw an error by invalid date", () => {
       const config = {
         defaultFieldTypes: {
           date: {
             validations: {
               extends: {
-                olderThan18: field => {
+                olderThan18: (field) => {
                   if (differenceInCalendarYears(new Date(), field.value) < 18) {
                     throw new ValidationError({
                       path: field.key,
@@ -93,8 +93,8 @@ describe('Custom date validations', () => {
             },
             transformations: {
               before: [
-                value => {
-                  return parse(value, 'P', new Date(), {
+                (value) => {
+                  return parse(value, "P", new Date(), {
                     locale: enUS,
                   });
                 },
@@ -104,27 +104,27 @@ describe('Custom date validations', () => {
         },
       };
       const fields = {
-        dateField: '01/01/2007',
+        dateField: "01/01/2007",
       };
       const schema = {
         fields: {
           dateField: {
-            type: 'date',
+            type: "date",
             validations: {
-              extends: ['olderThan18'],
+              extends: ["olderThan18"],
             },
           },
         },
       };
       expect(() => buildSchema(schema, fields, config)).toThrowError();
     });
-    test('should pass validation by valid date', () => {
+    test("should pass validation by valid date", () => {
       const config = {
         defaultFieldTypes: {
           date: {
             validations: {
               extends: {
-                olderThan18: field => {
+                olderThan18: (field) => {
                   if (differenceInCalendarYears(new Date(), field.value) < 18) {
                     throw new ValidationError({
                       path: field.key,
@@ -136,8 +136,8 @@ describe('Custom date validations', () => {
             },
             transformations: {
               before: [
-                value => {
-                  return parse(value, 'P', new Date(), {
+                (value) => {
+                  return parse(value, "P", new Date(), {
                     locale: enUS,
                   });
                 },
@@ -147,14 +147,14 @@ describe('Custom date validations', () => {
         },
       };
       const fields = {
-        dateField: '01/01/2000',
+        dateField: "01/01/2000",
       };
       const schema = {
         fields: {
           dateField: {
-            type: 'date',
+            type: "date",
             validations: {
-              extends: ['olderThan18'],
+              extends: ["olderThan18"],
             },
           },
         },
@@ -162,7 +162,7 @@ describe('Custom date validations', () => {
 
       const values = buildSchema(schema, fields, config);
 
-      const expectedDate = parse('01/01/2000', 'P', new Date(), {
+      const expectedDate = parse("01/01/2000", "P", new Date(), {
         locale: enUS,
       });
       expect(values).toMatchObject({
@@ -170,14 +170,14 @@ describe('Custom date validations', () => {
       });
     });
   });
-  describe('not today', () => {
-    test('should throw an error by invalid date', () => {
+  describe("not today", () => {
+    test("should throw an error by invalid date", () => {
       const config = {
         defaultFieldTypes: {
           date: {
             validations: {
               extends: {
-                notToday: field => {
+                notToday: (field) => {
                   if (isToday(field.value)) {
                     throw new ValidationError({
                       path: field.key,
@@ -196,22 +196,22 @@ describe('Custom date validations', () => {
       const schema = {
         fields: {
           dateField: {
-            type: 'date',
+            type: "date",
             validations: {
-              extends: ['notToday'],
+              extends: ["notToday"],
             },
           },
         },
       };
       expect(() => buildSchema(schema, fields, config)).toThrowError();
     });
-    test('should pass validation by valid date', () => {
+    test("should pass validation by valid date", () => {
       const config = {
         defaultFieldTypes: {
           date: {
             validations: {
               extends: {
-                notToday: field => {
+                notToday: (field) => {
                   if (isToday(field.value)) {
                     throw new ValidationError({
                       path: field.key,
@@ -231,9 +231,9 @@ describe('Custom date validations', () => {
       const schema = {
         fields: {
           dateField: {
-            type: 'date',
+            type: "date",
             validations: {
-              extends: ['notToday'],
+              extends: ["notToday"],
             },
           },
         },
@@ -243,14 +243,14 @@ describe('Custom date validations', () => {
       expect(values).toMatchObject({ dateField });
     });
   });
-  describe('not this month and year', () => {
-    test('should throw an error cause date its current month', () => {
+  describe("not this month and year", () => {
+    test("should throw an error cause date its current month", () => {
       const config = {
         defaultFieldTypes: {
           date: {
             validations: {
               extends: {
-                notThisMonthAndYear: field => {
+                notThisMonthAndYear: (field) => {
                   if (isThisMonth(field.value) && isThisYear(field.value)) {
                     throw new ValidationError({
                       path: field.key,
@@ -269,22 +269,22 @@ describe('Custom date validations', () => {
       const schema = {
         fields: {
           dateField: {
-            type: 'date',
+            type: "date",
             validations: {
-              extends: ['notThisMonthAndYear'],
+              extends: ["notThisMonthAndYear"],
             },
           },
         },
       };
       expect(() => buildSchema(schema, fields, config)).toThrowError();
     });
-    test('should pass validation cause date its 1 month ahead', () => {
+    test("should pass validation cause date its 1 month ahead", () => {
       const config = {
         defaultFieldTypes: {
           date: {
             validations: {
               extends: {
-                notThisMonthAndYear: field => {
+                notThisMonthAndYear: (field) => {
                   if (isThisMonth(field.value) && isThisYear(field.value)) {
                     throw new ValidationError({
                       path: field.key,
@@ -304,9 +304,9 @@ describe('Custom date validations', () => {
       const schema = {
         fields: {
           dateField: {
-            type: 'date',
+            type: "date",
             validations: {
-              extends: ['notThisMonthAndYear'],
+              extends: ["notThisMonthAndYear"],
             },
           },
         },
@@ -316,14 +316,14 @@ describe('Custom date validations', () => {
       expect(values).toMatchObject({ dateField });
     });
   });
-  describe('should use multiple custom validations', () => {
-    test('should throw an error cause date not match validations', () => {
+  describe("should use multiple custom validations", () => {
+    test("should throw an error cause date not match validations", () => {
       const config = {
         defaultFieldTypes: {
           date: {
             validations: {
               extends: {
-                notThisMonthAndYear: field => {
+                notThisMonthAndYear: (field) => {
                   if (isThisMonth(field.value) && isThisYear(field.value)) {
                     throw new ValidationError({
                       path: field.key,
@@ -331,7 +331,7 @@ describe('Custom date validations', () => {
                     });
                   }
                 },
-                olderThan18: field => {
+                olderThan18: (field) => {
                   if (differenceInCalendarYears(new Date(), field.value) < 18) {
                     throw new ValidationError({
                       path: field.key,
@@ -350,9 +350,9 @@ describe('Custom date validations', () => {
       const schema = {
         fields: {
           dateField: {
-            type: 'date',
+            type: "date",
             validations: {
-              extends: ['notThisMonthAndYear', 'olderThan18'],
+              extends: ["notThisMonthAndYear", "olderThan18"],
             },
           },
         },
@@ -362,15 +362,15 @@ describe('Custom date validations', () => {
   });
 });
 
-describe('Custom string validations', () => {
-  describe('should use patterns', () => {
-    test('should throw an error using custom pattern', () => {
+describe("Custom string validations", () => {
+  describe("should use patterns", () => {
+    test("should throw an error using custom pattern", () => {
       const config = {
         defaultFieldTypes: {
           string: {
             validations: {
               patterns: {
-                onlyNumbers: field => {
+                onlyNumbers: (field) => {
                   if (!Number(field.value)) {
                     throw new ValidationError({
                       path: field.key,
@@ -384,15 +384,15 @@ describe('Custom string validations', () => {
         },
       };
       const fields = {
-        stringField: 'a123',
+        stringField: "a123",
       };
       const schema = {
         fields: {
           stringField: {
-            type: 'string',
+            type: "string",
             validations: {
               default: {
-                patterns: ['onlyNumbers'],
+                patterns: ["onlyNumbers"],
               },
             },
           },
@@ -400,13 +400,13 @@ describe('Custom string validations', () => {
       };
       expect(() => buildSchema(schema, fields, config)).toThrowError();
     });
-    test('should pass pattern', () => {
+    test("should pass pattern", () => {
       const config = {
         defaultFieldTypes: {
           string: {
             validations: {
               patterns: {
-                onlyNumbers: field => {
+                onlyNumbers: (field) => {
                   if (!Number(field.value)) {
                     throw new ValidationError({
                       path: field.key,
@@ -420,15 +420,15 @@ describe('Custom string validations', () => {
         },
       };
       const fields = {
-        stringField: '123',
+        stringField: "123",
       };
       const schema = {
         fields: {
           stringField: {
-            type: 'string',
+            type: "string",
             validations: {
               default: {
-                patterns: ['onlyNumbers'],
+                patterns: ["onlyNumbers"],
               },
             },
           },
@@ -437,20 +437,20 @@ describe('Custom string validations', () => {
       const values = buildSchema(schema, fields, config);
       expect(values).toMatchObject(fields);
     });
-    test('should throw an error cause pattern was not found', () => {
+    test("should throw an error cause pattern was not found", () => {
       const config = {
         defaultFieldTypes: {},
       };
       const fields = {
-        stringField: 'a123',
+        stringField: "a123",
       };
       const schema = {
         fields: {
           stringField: {
-            type: 'string',
+            type: "string",
             validations: {
               default: {
-                patterns: ['onlyNumbers'],
+                patterns: ["onlyNumbers"],
               },
             },
           },
@@ -461,19 +461,19 @@ describe('Custom string validations', () => {
   });
 });
 
-describe('Default string validations', () => {
-  describe('maxLength', () => {
-    test('should throw an error cause field is longer than expected', () => {
+describe("Default string validations", () => {
+  describe("maxLength", () => {
+    test("should throw an error cause field is longer than expected", () => {
       const config = {
         defaultFieldTypes: {},
       };
       const fields = {
-        stringField: 'this is longer than 10',
+        stringField: "this is longer than 10",
       };
       const schema = {
         fields: {
           stringField: {
-            type: 'string',
+            type: "string",
             validations: {
               default: {
                 maxLength: 10,
@@ -484,17 +484,17 @@ describe('Default string validations', () => {
       };
       expect(() => buildSchema(schema, fields, config)).toThrowError();
     });
-    test('should pass validation cause field is shorter as expected', () => {
+    test("should pass validation cause field is shorter as expected", () => {
       const config = {
         defaultFieldTypes: {},
       };
       const fields = {
-        stringField: 'this is less than 20',
+        stringField: "this is less than 20",
       };
       const schema = {
         fields: {
           stringField: {
-            type: 'string',
+            type: "string",
             validations: {
               default: {
                 maxLength: 20,
@@ -507,21 +507,21 @@ describe('Default string validations', () => {
       expect(values).toMatchObject(fields);
     });
   });
-  describe('onlyLetters', () => {
-    test('should throw an error cause field contains numbers', () => {
+  describe("onlyLetters", () => {
+    test("should throw an error cause field contains numbers", () => {
       const config = {
         defaultFieldTypes: {},
       };
       const fields = {
-        stringField: 'this string has numbers 123',
+        stringField: "this string has numbers 123",
       };
       const schema = {
         fields: {
           stringField: {
-            type: 'string',
+            type: "string",
             validations: {
               default: {
-                patterns: ['onlyLetters'],
+                patterns: ["onlyLetters"],
               },
             },
           },
@@ -529,20 +529,20 @@ describe('Default string validations', () => {
       };
       expect(() => buildSchema(schema, fields, config)).toThrowError();
     });
-    test('should pass validation cause field not contain numbers', () => {
+    test("should pass validation cause field not contain numbers", () => {
       const config = {
         defaultFieldTypes: {},
       };
       const fields = {
-        stringField: 'this string not has numbers',
+        stringField: "this string not has numbers",
       };
       const schema = {
         fields: {
           stringField: {
-            type: 'string',
+            type: "string",
             validations: {
               default: {
-                patterns: ['onlyLetters'],
+                patterns: ["onlyLetters"],
               },
             },
           },
@@ -554,19 +554,19 @@ describe('Default string validations', () => {
   });
 });
 
-describe('Multiple fields some required and not other', () => {
-  describe('maxLength', () => {
-    test('should throw an error cause field is longer than expected', () => {
+describe("Multiple fields some required and not other", () => {
+  describe("maxLength", () => {
+    test("should throw an error cause field is longer than expected", () => {
       const config = {
         defaultFieldTypes: {},
       };
       const fields = {
-        stringField: 'this is longer than 10',
+        stringField: "this is longer than 10",
       };
       const schema = {
         fields: {
           stringField: {
-            type: 'string',
+            type: "string",
             validations: {
               default: {
                 maxLength: 10,
@@ -577,17 +577,17 @@ describe('Multiple fields some required and not other', () => {
       };
       expect(() => buildSchema(schema, fields, config)).toThrowError();
     });
-    test('should pass validation cause field is shorter as expected', () => {
+    test("should pass validation cause field is shorter as expected", () => {
       const config = {
         defaultFieldTypes: {},
       };
       const fields = {
-        stringField: 'this is less than 20',
+        stringField: "this is less than 20",
       };
       const schema = {
         fields: {
           stringField: {
-            type: 'string',
+            type: "string",
             validations: {
               default: {
                 maxLength: 20,
@@ -600,21 +600,21 @@ describe('Multiple fields some required and not other', () => {
       expect(values).toMatchObject(fields);
     });
   });
-  describe('onlyLetters', () => {
-    test('should throw an error cause field contains numbers', () => {
+  describe("onlyLetters", () => {
+    test("should throw an error cause field contains numbers", () => {
       const config = {
         defaultFieldTypes: {},
       };
       const fields = {
-        stringField: 'this string has numbers 123',
+        stringField: "this string has numbers 123",
       };
       const schema = {
         fields: {
           stringField: {
-            type: 'string',
+            type: "string",
             validations: {
               default: {
-                patterns: ['onlyLetters'],
+                patterns: ["onlyLetters"],
               },
             },
           },
@@ -622,17 +622,17 @@ describe('Multiple fields some required and not other', () => {
       };
       expect(() => buildSchema(schema, fields, config)).toThrowError();
     });
-    test('should pass validation cause field not contain numbers', () => {
+    test("should pass validation cause field not contain numbers", () => {
       const config = {
         defaultFieldTypes: {},
       };
       const fields = {
-        stringField: 'this string has numbers',
+        stringField: "this string has numbers",
       };
       const schema = {
         fields: {
           stringField: {
-            type: 'string',
+            type: "string",
             validations: {
               default: {
                 onlyLetters: true,
