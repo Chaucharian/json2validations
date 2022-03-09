@@ -1,16 +1,14 @@
-import babel from "@rollup/plugin-babel";
 import typescript from "@rollup/plugin-typescript";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
 
 const config = {
   input: "src/main.ts",
   output: {
-    dir: "output",
-    format: "commonjs",
+    dir: "dist",
+    format: "umd",
+    name: "window",
   },
-  plugins: [
-    typescript({ tsconfig: "./tsconfig.json" }),
-    // babel({ babelHelpers: "bundled", presets: ["@babel/preset-typescript"] }),
-  ],
+  plugins: [nodeResolve(), typescript({ tsconfig: "./tsconfig.json" })],
 };
 
 export default config;
