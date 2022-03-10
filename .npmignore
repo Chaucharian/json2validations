@@ -1,0 +1,9 @@
+node_modules/
+src/
+.gitignore
+*.log
+*.config.js
+
+npm-debug.log
+yarn-error.log
+

@@ -14,9 +14,9 @@
 // Fields
 // - Every field its by default optional
 
-import Config from './config';
+import Config from "./config";
 // import GlobalConfig from './config';
-import { SchemaTypeNotFound, FormErrors, SchemaError } from './errors';
+import { SchemaTypeNotFound, FormErrors, SchemaError } from "./errors";
 
 // const defaultTypes = Object.keys(
 //   GlobalConfig.getDefaultConfig().defaultFieldTypes,
@@ -24,7 +24,7 @@ import { SchemaTypeNotFound, FormErrors, SchemaError } from './errors';
 
 const runTransformations = (transformations, field) => {
   let fieldValue = field.value ?? null;
-  transformations.forEach(transformation => {
+  transformations.forEach((transformation) => {
     fieldValue = transformation(fieldValue ?? field.value);
   });
   return { value: fieldValue, key: field.key };
@@ -34,10 +34,10 @@ const runCustomValidations = (
   field,
   schemaValidations = [],
   customValidations,
-  config,
+  config
 ) => {
   checkCustomValidations(schemaValidations, customValidations);
-  schemaValidations.forEach(validationName => {
+  schemaValidations.forEach((validationName) => {
     customValidations[validationName](field, config);
   });
 };
@@ -45,16 +45,16 @@ const runCustomValidations = (
 const runBasicValidations = (field, typeName, config) => {
   const basicValidations =
     config.getDefaultConfig().defaultFieldTypes[typeName].validations.basic;
-  Object.keys(basicValidations).forEach(validationName => {
+  Object.keys(basicValidations).forEach((validationName) => {
     basicValidations[validationName](field, config);
   });
 };
 
 const checkCustomValidations = (schemaValidations = [], customValidations) => {
-  schemaValidations.forEach(validationName => {
+  schemaValidations.forEach((validationName) => {
     if (!customValidations[validationName]) {
       throw new SchemaError(
-        `The ${validationName} extended validation wasn't found in your config`,
+        `The ${validationName} extended validation wasn't found in your config`
       );
     }
   });
@@ -62,8 +62,8 @@ const checkCustomValidations = (schemaValidations = [], customValidations) => {
 
 const runSchemaCustomValidation = (fields, config) => {
   if (
-    typeof config.getSchema()?.customValidation === 'string' &&
-    typeof config.getCustomConfig()?.customValidation === 'object'
+    typeof config.getSchema()?.customValidation === "string" &&
+    typeof config.getCustomConfig()?.customValidation === "object"
   ) {
     config
       .getCustomConfig()
@@ -74,12 +74,12 @@ const runSchemaCustomValidation = (fields, config) => {
 const buildSchema = (
   schema: any,
   fields: any,
-  config = { defaultFieldTypes: {} },
+  config = { defaultFieldTypes: {} }
 ) => {
   const GlobalConfig = new Config();
   const defaultTypes = Object.keys(
-    GlobalConfig.getDefaultConfig().defaultFieldTypes,
-  ).join(',');
+    GlobalConfig.getDefaultConfig().defaultFieldTypes
+  ).join(",");
   const getSchemaField = (key: string) => schema.fields[key];
   const isCustomType = (key: string) =>
     !GlobalConfig.getDefaultConfig().defaultFieldTypes[key] ? true : false;
@@ -87,7 +87,7 @@ const buildSchema = (
   const outputFields = {};
 
   // Validate if is default type or extends from one
-  Object.keys(config.defaultFieldTypes).forEach(typeName => {
+  Object.keys(config.defaultFieldTypes).forEach((typeName) => {
     if (
       !GlobalConfig.getDefaultConfig().defaultFieldTypes[typeName] &&
       !GlobalConfig.getDefaultConfig().defaultFieldTypes[
@@ -96,14 +96,14 @@ const buildSchema = (
     ) {
       throw new SchemaTypeNotFound(
         `The type ${typeName} must be a default type or extend from a valid type, available types are: ${defaultTypes}`,
-        typeName,
+        typeName
       );
     }
   });
 
   GlobalConfig.setCustomConfig(config);
   GlobalConfig.setSchema(schema);
-  console.log('EEEE', fields);
+  console.log("EEEE", fields);
   const fieldsAmount = Object.keys(fields).length;
   Object.keys(fields).forEach((key: string, index: number) => {
     const field = { key, value: fields[key] };
@@ -134,7 +134,7 @@ const buildSchema = (
         // only run them if they're in the schema
         const runDefaultValidation = GlobalConfig.getDefaultValidation(
           extendsFromType,
-          validationName,
+          validationName
         );
 
         const firstTransformations =
@@ -147,7 +147,7 @@ const buildSchema = (
         // 1# STEP RUN TRANSFORMATIONS IF ANY
         let transformatedField = runTransformations(
           firstTransformations,
-          field,
+          field
         );
 
         // 2# STEP RUN BASIC TYPE VALIDATIONS
@@ -158,14 +158,14 @@ const buildSchema = (
             required: getSchemaField(key).required === true ? true : false,
           },
           extendsFromType,
-          GlobalConfig,
+          GlobalConfig
         );
         // 3# STEP RUN DEFAULT TYPE VALIDATIONS
         hasDefaultValidations &&
           runDefaultValidation(
             transformatedField,
             validationCriteria,
-            GlobalConfig,
+            GlobalConfig
           );
 
         //4# STEP RUN CUSTOM TYPE VALIDATIONS
@@ -175,19 +175,19 @@ const buildSchema = (
           getSchemaField(key).validations?.extends,
           config.defaultFieldTypes[getSchemaField(key).type]?.validations
             ?.extends,
-          GlobalConfig,
+          GlobalConfig
         );
 
         //6# STEP RUN LAST TRANSFORMATIONS (OUTPUT)
         transformatedField = runTransformations(
           secondTransformations,
-          transformatedField,
+          transformatedField
         );
 
         //7# STEP RETURN NEW FIELDS
         // store field values for each field in a new obj
         outputFields[key] = transformatedField.value;
-      },
+      }
     );
   });
   //8# STEP RUN CUSTOM SCHEMA VALIDATION
@@ -203,3 +203,5 @@ const buildSchema = (
 };
 
 export default buildSchema;
+
+export const ejemplo = { a: 1 };
