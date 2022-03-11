@@ -1,62 +1,67 @@
+import Config from "./config";
 class CustomError extends Error {
   public date: Date;
 
-  constructor(error: { name: string; type: string }, ...params: any) {
+  constructor(error: { name: string }, ...params: any) {
     // Pass remaining arguments (including vendor specific ones) to parent constructor
     super(...params);
 
-    this.name = error.name ?? 'CustomError';
+    this.name = error.name ?? "CustomError";
     // Custom debugging information
     this.date = new Date();
   }
 }
 
+export class ValidationError extends CustomError {
+  public path: string;
+  public type: string;
+  constructor(error: FormError, ...args) {
+    super({ name: "FormError" }, ...args);
+    this.type = ErrorTypes.ValidationError;
+    this.path = error.path;
+    this.message = error.message;
+  }
+}
 export class SchemaTypeNotFound extends CustomError {
   public path: string;
   constructor(message: string, path: string) {
-    super({ name: 'SchemaTypeNotFound' }, message);
+    super({ name: "SchemaTypeNotFound" }, message);
     this.path = path;
   }
 }
 
 export class SchemaError extends CustomError {
   constructor(message: string) {
-    super({ name: 'SchemaError', type: 'Schema' }, message);
+    super({ name: "SchemaError" }, message);
   }
 }
 
+export interface CommonValidationParams {
+  field: Field;
+  config: Config;
+}
+
 export interface Validation {
-  [k: string]: (fn: CommonValidationParams) => void;
+  [k: string]: (args: CommonValidationParams) => void;
 }
 
 export interface Field {
   [k: string]: any;
 }
 
-export interface FormErrorData {
+export interface FormError {
   path: string;
   message: string;
   type?: string;
 }
 export class FormErrors extends Error {
-  inner: FormErrorData[];
-  constructor(errors: FormErrorData[]) {
-    super(errors.map(({ message }) => message).join('. '));
+  inner: FormError[];
+  constructor(errors: FormError[]) {
+    super(errors.map(({ message }) => message).join(". "));
     this.inner = errors;
   }
 }
 
 enum ErrorTypes {
-  ValidationError = 'ValidationError',
-}
-export class ValidationError extends Error {
-  public error: FormErrorData;
-  public path: string;
-  public type: string;
-  constructor(error: FormErrorData, ...args) {
-    super(...args);
-    this.type = ErrorTypes.ValidationError;
-    this.path = error.path;
-    this.message = error.message;
-  }
+  ValidationError = "ValidationError",
 }
