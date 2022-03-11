@@ -1,10 +1,10 @@
 {
   "name": "json2validations",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "I simple JSON schema for form validations",
   "main": "dist/build.js",
   "module": "dist/build.es.js",
-  "types": "dist/types",
+  "types": "dist/types/index.d.ts",
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "rimraf ./dist && rollup -c",

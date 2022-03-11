@@ -3,6 +3,7 @@ src/
 .gitignore
 *.log
 *.config.js
+*.config.json
 
 npm-debug.log
 yarn-error.log
