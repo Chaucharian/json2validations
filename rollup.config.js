@@ -1,12 +1,15 @@
 import typescript from "@rollup/plugin-typescript";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import { terser } from "rollup-plugin-terser";
+import filesize from "rollup-plugin-filesize";
+import progress from "rollup-plugin-progress";
+import visualizer from "rollup-plugin-visualizer";
 
 const config = [
   {
-    input: "src/main.ts",
+    input: "src/index.ts",
     output: {
-      file: "dist/build.es.js",
+      file: "dist/index.es.js",
       format: "es",
       name: "window",
     },
@@ -17,9 +20,9 @@ const config = [
     ],
   },
   {
-    input: "src/main.ts",
+    input: "src/index.ts",
     output: {
-      file: "dist/build.js",
+      file: "dist/index.js",
       format: "cjs",
       name: "window",
     },
@@ -27,6 +30,9 @@ const config = [
       nodeResolve(),
       typescript({ tsconfig: "./tsconfig.json" }),
       terser(),
+      filesize(),
+      progress(),
+      visualizer(),
     ],
   },
 ];

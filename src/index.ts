@@ -1,5 +1,5 @@
-export default "./main";
-export * from "./main";
+import buildSchema from "./main";
+export default buildSchema;
 export * from "./types";
 export * from "./errors";
 export * from "./config";
