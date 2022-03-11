@@ -103,7 +103,7 @@ const buildSchema = (
 
   GlobalConfig.setCustomConfig(config);
   GlobalConfig.setSchema(schema);
-  console.log("EEEE", fields);
+
   const fieldsAmount = Object.keys(fields).length;
   Object.keys(fields).forEach((key: string, index: number) => {
     const field = { key, value: fields[key] };
@@ -203,5 +203,3 @@ const buildSchema = (
 };
 
 export default buildSchema;
-
-export const ejemplo = { a: 1 };
