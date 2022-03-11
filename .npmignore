@@ -2,6 +2,7 @@ node_modules/
 src/
 .gitignore
 *.log
+tsconfig.json
 *.config.js
 *.config.json
 

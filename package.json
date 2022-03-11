@@ -1,6 +1,6 @@
 {
   "name": "json2validations",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "I simple JSON schema for form validations",
   "main": "dist/build.js",
   "module": "dist/build.es.js",
