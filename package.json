@@ -1,6 +1,6 @@
 {
   "name": "json2validations",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "I simple JSON schema for form validations",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
@@ -8,7 +8,7 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "rimraf ./dist && rollup -c",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",

@@ -17,6 +17,9 @@ const config = [
       nodeResolve(),
       typescript({ tsconfig: "./tsconfig.json" }),
       terser(),
+      filesize(),
+      progress(),
+      visualizer(),
     ],
   },
   {

@@ -9,7 +9,8 @@ import {
 } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { FormErrors, SchemaError, ValidationError } from "../errors";
-import buildSchema from "../main";
+import { buildSchema } from "../main";
+import { currencyFormat, currencyToNumber } from "./helpers";
 
 describe("Internal build flow", () => {
   test("should throw an error cause custom validation on JSON schema was not found on config object", () => {
@@ -70,6 +71,95 @@ describe("Internal build flow", () => {
     };
     const values = buildSchema(schema, fields, config);
     expect(values).toMatchObject(fields);
+  });
+});
+
+describe("Create custom type", () => {
+  describe("must create a new type called currency and run inherited validations from number", () => {
+    test("should run a transformation and native validation", () => {
+      const config = {
+        defaultFieldTypes: {
+          currency: {
+            from: "number",
+            validations: {},
+            transformations: {
+              after: [currencyFormat],
+            },
+          },
+        },
+      };
+      const fields = {
+        currencyField: 4,
+      };
+      const schema = {
+        fields: {
+          currencyField: {
+            required: true,
+            type: "currency",
+            validations: {
+              default: {
+                maximum: 5,
+              },
+            },
+          },
+        },
+      };
+
+      const values = buildSchema(schema, fields, config);
+      expect(values).toMatchObject({
+        currencyField: "$4.00",
+      });
+    });
+    test("should throw a FormError", () => {
+      const config = {
+        defaultFieldTypes: {
+          currency: {
+            from: "number",
+            validations: {},
+            transformations: {
+              after: [currencyFormat],
+            },
+          },
+        },
+      };
+      const fields = {
+        currencyField: 6,
+      };
+      const schema = {
+        fields: {
+          currencyField: {
+            required: true,
+            type: "currency",
+            validations: {
+              default: {
+                maximum: 5,
+              },
+            },
+          },
+        },
+      };
+      expect(() => buildSchema(schema, fields, config)).toThrowError();
+    });
+  });
+});
+
+describe("Use case", () => {
+  describe("string is expected type but number is recived", () => {
+    test("should throw an error", () => {
+      const fields = {
+        currencyField: 112,
+      };
+      const schema = {
+        fields: {
+          currencyField: {
+            required: true,
+            type: "string",
+          },
+        },
+      };
+
+      expect(() => buildSchema(schema, fields)).toThrowError();
+    });
   });
 });
 
@@ -482,7 +572,9 @@ describe("Default string validations", () => {
           },
         },
       };
-      expect(() => buildSchema(schema, fields, config)).toThrowError();
+      expect(() => buildSchema(schema, fields, config)).toThrowError(
+        FormErrors
+      );
     });
     test("should pass validation cause field is shorter as expected", () => {
       const config = {

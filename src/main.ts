@@ -17,6 +17,8 @@
 import Config from "./config";
 // import GlobalConfig from './config';
 import { SchemaTypeNotFound, FormErrors, SchemaError } from "./errors";
+import { matchWithType } from "./utils";
+import { hasToValidate } from "./validations/utils";
 
 // const defaultTypes = Object.keys(
 //   GlobalConfig.getDefaultConfig().defaultFieldTypes,
@@ -43,11 +45,13 @@ const runCustomValidations = (
 };
 
 const runBasicValidations = (field, typeName, config) => {
+  let passValidation = true;
   const basicValidations =
     config.getDefaultConfig().defaultFieldTypes[typeName].validations.basic;
   Object.keys(basicValidations).forEach((validationName) => {
-    basicValidations[validationName](field, config);
+    passValidation = basicValidations[validationName](field, config);
   });
+  return passValidation;
 };
 
 const checkCustomValidations = (schemaValidations = [], customValidations) => {
@@ -71,7 +75,7 @@ const runSchemaCustomValidation = (fields, config) => {
   }
 };
 
-const buildSchema = (
+export const buildSchema = (
   schema: any,
   fields: any,
   config = { defaultFieldTypes: {} }
@@ -115,7 +119,7 @@ const buildSchema = (
       return;
     }
 
-    // get default validations cause its a custom type or its native type (date, string, number ...)
+    // get date type (date, string, number ...)
     const extendsFromType =
       config.defaultFieldTypes[getSchemaField(key).type]?.from ??
       getSchemaField(key).type;
@@ -152,7 +156,7 @@ const buildSchema = (
 
         // 2# STEP RUN BASIC TYPE VALIDATIONS
         // always run basic validations for every type
-        runBasicValidations(
+        const isValidType = runBasicValidations(
           {
             ...transformatedField,
             required: getSchemaField(key).required === true ? true : false,
@@ -160,8 +164,14 @@ const buildSchema = (
           extendsFromType,
           GlobalConfig
         );
+        // if field value not meet date type structure just throws an error
+        if (!isValidType) {
+          return;
+        }
+
         // 3# STEP RUN DEFAULT TYPE VALIDATIONS
         hasDefaultValidations &&
+          hasToValidate(transformatedField) &&
           runDefaultValidation(
             transformatedField,
             validationCriteria,
@@ -201,5 +211,3 @@ const buildSchema = (
 
   return outputFields;
 };
-
-export default buildSchema;
