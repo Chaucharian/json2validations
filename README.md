@@ -74,29 +74,11 @@ const config = {
     /* name of your custom or native (string, number...) type*/
     currency: {
       from: "number",
-      validations: {
-        extends: {
-          olderThan18: (field) => {
-            if (differenceInCalendarYears(new Date(), field.value) < 18) {
-              throw new ValidationError({
-                path: field.key,
-                message: `${field.key} must be at least 18 years from current date`,
-              });
-            }
-          },
-        },
-      },
+      validations: {},
       transformations: {
-        before: [
-          (value) => {
-            return parse(value, "P", new Date(), {
-              locale: enUS,
-            });
-          },
-        ],
+        after: [currencyFormat],
       },
     },
-  },
 };
 ```
 

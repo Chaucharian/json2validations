@@ -17,7 +17,6 @@
 import Config from "./config";
 // import GlobalConfig from './config';
 import { SchemaTypeNotFound, FormErrors, SchemaError } from "./errors";
-import { matchWithType } from "./utils";
 import { hasToValidate } from "./validations/utils";
 
 // const defaultTypes = Object.keys(
