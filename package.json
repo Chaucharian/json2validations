@@ -1,6 +1,6 @@
 {
   "name": "json2validations",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "I simple JSON schema for form validations",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
@@ -14,7 +14,19 @@
     "type": "git",
     "url": "git+https://github.com/Chaucharian/json2validations.git"
   },
-  "keywords": [],
+  "keywords": [
+    "form validations",
+    "schema",
+    "json",
+    "form errors",
+    "declarative",
+    "transformations",
+    "form",
+    "validations",
+    "react",
+    "front end",
+    "cross framework"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
