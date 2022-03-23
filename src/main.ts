@@ -15,13 +15,8 @@
 // - Every field its by default optional
 
 import Config from "./config";
-// import GlobalConfig from './config';
 import { SchemaTypeNotFound, FormErrors, SchemaError } from "./errors";
 import { hasToValidate } from "./validations/utils";
-
-// const defaultTypes = Object.keys(
-//   GlobalConfig.getDefaultConfig().defaultFieldTypes,
-// ).join(',');
 
 const runTransformations = (transformations, field) => {
   let fieldValue = field.value ?? null;

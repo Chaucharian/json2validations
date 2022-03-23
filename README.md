@@ -1,8 +1,7 @@
 <h1 align="center">json2validations</h1>
 
-json2validations is a schema builder. Its main purpose is to create form validations from a JSON.
-
-This library inherits the idea of how [JSONSchema Epecification](https://cswr.github.io/JsonSchema/) agroups entities, but tries to be a more declarative way of creating form validations.
+json2validations is a schema builder and Schema Definition the main purpose is to create form validations from a JSON.
+It allows implementing complex data validation logic via declarative schemas for your form data, without writing code.
 
 ## Table of contents
 
@@ -30,18 +29,21 @@ buildSchema(schema, fields, config);
 
 ## Schema
 
-`fields` its where you'll add the form fields you want to validate, every key in the object has to be a field name in your form. The idea its to define all its properties here to create the expected validation.
+The schema is the heart of the system, other JSON schema validations libraries implement [JSONSchema Specification](https://cswr.github.io/JsonSchema/) to advantage of its standarized interface, that result loosing scope trying to solve a lot of scenarios. This new schema its aimed to solve form validations only, giving you more flexibility making custom validations and more.
 
-#### This is the schema shape
+Let's get started understanding how all the pieces go together into the schema.
 
-```json
+All in the schema are fields, to explain that to the schema builder you have to add the `fields` key to your JSON, every key will be a field, there's where you add the form fields you want to validate, every key name has to be a field name in your form.
+
+```js
 {
     fields: {
         [FIELD_NAME]: {
-            type: /* string | number | date | boolean */
+            type: '',/* string | number | date | boolean */
             errorMessages: {
-                [ERROR_NAME]: /* string */
+                [ERROR_NAME]: "some custom error message" /* string */
             },
+            required: 'false',/* boolean */
             validations: {
                 default: {
                     /* number type only */
@@ -50,8 +52,7 @@ buildSchema(schema, fields, config);
                     /* string type only */
                     maxLength: /* number */
                     minLength: /* number */
-
-                  patterns: /* [customRegEx | customPattern | "onlyLetters" ] */
+                    patterns: /* [customRegEx | customPattern | "onlyLetters" ] */
                 },
                 extends: /* [customValidationName, customValidationName2] */
             }
@@ -62,21 +63,38 @@ buildSchema(schema, fields, config);
 
 ## Config
 
-The config object will allow you to extend the functionality of the builder as create your custom types or hook up to the build flow adding transformations before and after validations are executed
+The config object will allow you to extend the functionality of the builder as create your custom types or hook up to the build flow, also create transformations before and after validations are executed
 
-This is a common scenario where you want a field to show currency amount.
-Instead of having to create a mask for the field with the currency format and after that run some specefic validation, you could do it all here, declaratively
+Here you define all the patterns, validations and transformations you'll expect for every field type
+To add your custom functionality you have to match the name type, `defaultFieldTypes` its where all the types are defined
+Type interface allows a few keys:
+
+`from` name type to extend validations from
+
+`validations` object of custom validations
+
+- `patterns` (string only) an Array of custom patterns
+- `extends` here define your custom validation functions
+
+`transformations` object to apply value transformations before and after validations
+
+- `before` an Array of transformations to be executed before validations
+- `after` an Array of transformations to be executed after validations
 
 ```js
 const config = {
-  /* Here goes your types overrides, as custom validations or transformations */
   defaultFieldTypes: {
-    /* name of your custom or native (string, number...) type*/
-    currency: {
-      from: "number",
-      validations: {},
+    /* name type (string, number...)*/
+    [string | number | boolean | date]: {
+      from: "string | number | boolean | date",
+      validations: {
+          patterns: [function someCustomPattern(field, config) {}],
+        extends: {
+          someCustomValidation: (field, config) {}
+        }
+      },
       transformations: {
-        after: [currencyFormat],
+        after: [function someTransformation(value) {}: any],
       },
     },
 };
@@ -111,4 +129,52 @@ const fields = buildSchema(schema, fields);
 
 // OUTPUT
 // FormErrors: testinField max length of 10 exceded
+```
+
+- custom validations
+
+Imagine you have a date field that validates if the value entered is this month or this year.
+To create that custom validation just 2 steps are needed.
+
+1. add your custom validation into `extends`
+2. pass your error with config.`setError`
+
+```js
+/* config to schema builder */
+  const config = {
+        defaultFieldTypes: {
+          date: {
+            validations: {
+              extends: {
+                notThisMonthAndYear: (field, config) => {
+                  if (isThisMonth(field.value) && isThisYear(field.value)) {
+                    config.setError(new ValidationError({
+                      path: field.key,
+                      message: `${field.key} must not be this month and year`,
+                    });
+                  })
+                },
+              },
+            },
+          },
+        },
+      };
+
+/* these are  your form fields */
+const fields = {
+  testingField: new Date(),
+};
+/* this is your JSON schema (coming from an API maybe...) */
+ const schema = {
+        fields: {
+          testingField: {
+            type: "date",
+            validations: {
+              extends: ["notThisMonthAndYear"],
+            },
+          },
+        },
+      };
+
+const fields = buildSchema(schema, fields, config);
 ```
