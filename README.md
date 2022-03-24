@@ -9,9 +9,9 @@ It allows implementing complex data validation logic via declarative schemas for
 2. [Builder ](#Builder)
 3. [Schema](#Schema)
 4. [Config](#Config)
-5. [Use case](#Usecase
-   - [Using native types](#native)
-   - [Using custom types](#custom)
+5. [Examples](#Examples)
+   - Using native types
+   - Using custom types
 
 ## Install
 
@@ -106,9 +106,9 @@ const config = {
 };
 ```
 
-## Use case
+## Examples
 
-- native type validations
+- native validations
 
 Imagine you have a field that accepts less than 10 characters, that will look something like this
 
