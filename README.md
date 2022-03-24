@@ -9,7 +9,7 @@ It allows implementing complex data validation logic via declarative schemas for
 2. [Builder ](#Builder)
 3. [Schema](#Schema)
 4. [Config](#Config)
-5. [Use case](#Usecase)
+5. [Use case](#Usecase
    - [Using native types](#native)
    - [Using custom types](#custom)
 
@@ -18,6 +18,12 @@ It allows implementing complex data validation logic via declarative schemas for
 ```sh
 yarn add json2validations
 ```
+
+## Example
+
+Here an example using [react-hook-form](https://react-hook-form.com/advanced-usage#CustomHookwithResolver) to handle common scenarios
+
+[CodeSanbox](https://codesandbox.io/s/react-hook-form-json2validations-vlq42j?file=/src/App.js)
 
 ## Builder
 
